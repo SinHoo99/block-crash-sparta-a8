@@ -144,7 +144,11 @@ public class MainSceneManager : MonoBehaviour
         if (--blockCount == 0)
         {
             isClear = true;
-
+            if (stageLevel == 5)
+            {
+                GameOver();
+                return;
+            }
             StartCoroutine(StartStage(++stageLevel));
         }             
     }

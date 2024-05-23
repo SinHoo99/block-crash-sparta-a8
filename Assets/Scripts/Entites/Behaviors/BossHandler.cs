@@ -31,6 +31,7 @@ public class BossHandler : BlockHandler
         if (currentHp == 0)
         {
             Destroy(gameObject);
+            MainSceneManager.Instance.DestroyBlock(blockSO.score);
         }
         else if (currentHp == 30)
         {
