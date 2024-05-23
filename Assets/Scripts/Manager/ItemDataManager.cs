@@ -57,7 +57,6 @@ public class ItemDataManager : MonoBehaviour
         {
             int randomItemIndex = UnityEngine.Random.Range(1, 5); // 1부터 4 사이의 랜덤한 값을 선택
             ItemSO itemData = GetData(randomItemIndex);
-            Debug.Log("랜덤아이템값" + randomItemIndex);
             if (itemData != null && itemPrefab != null)
             {
                 GameObject itemObject = Instantiate(itemPrefab, position, Quaternion.identity);

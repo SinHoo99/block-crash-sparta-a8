@@ -5,7 +5,7 @@ using static Unity.Collections.AllocatorManager;
 
 public class BallController : MonoBehaviour
 {
-    private float defaultSpeed = 2f;
+    private float defaultSpeed = 5f;
     private Rigidbody2D rigidbody;
     private TrailRenderer trailRenderer;    
 
@@ -97,7 +97,6 @@ public class BallController : MonoBehaviour
         // X축 방향의 속도를 왼쪽 또는 오른쪽으로 반전
         float direction = isLeftCollision ? -1f : 1f;
         rigidbody.velocity = new Vector2(direction * Mathf.Abs(rigidbody.velocity.x), rigidbody.velocity.y);
-        Debug.Log("되는데");
     }
     //블록에 닿았을때
     private void ProcessBlockCollision(Collision2D collision)
@@ -115,11 +114,22 @@ public class BallController : MonoBehaviour
     //패들을 제외한 오브젝트에 닿았을때
     private void ObjectCollision(Collision2D collision)
     {
-        float angleChangeRadians = Mathf.Deg2Rad * Random.Range(-5f, 5f);
+        Vector2 newDirection = rigidbody.velocity.normalized;
 
-        Vector2 newDirection = Quaternion.Euler(0, 0, Mathf.Rad2Deg * angleChangeRadians) * rigidbody.velocity.normalized;
+        Vector2 localXAxis = new Vector2(1f, 0f); // 오브젝트의 로컬 x축
+        Vector2 localYAxis = new Vector2(0f, 1f); // 오브젝트의 로컬 y축
 
-        rigidbody.velocity = newDirection * rigidbody.velocity.magnitude;
+        float angleWithXAxis = Vector2.Angle(newDirection, localXAxis);
+        float angleWithYAxis = Vector2.Angle(newDirection, localYAxis);
+
+        if (Mathf.Approximately(angleWithXAxis, 180f) || Mathf.Approximately(angleWithYAxis, 180f))
+        { 
+            float angleChangeRadians = Mathf.Deg2Rad * Random.Range(-30f, 30f);
+            newDirection = Quaternion.Euler(0, 0, Mathf.Rad2Deg * angleChangeRadians) * newDirection;
+        }
+
+
+        rigidbody.velocity = newDirection * defaultSpeed;
     }
     // 바닥에 닿았을때
     public void Destroyed()

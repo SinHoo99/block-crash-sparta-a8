@@ -38,7 +38,6 @@ public class BlockHandler : MonoBehaviour
             if (currentHp <= 0)
             {
                 Destroy(gameObject);
-                Debug.Log("SpawnItem 메서드 호출 시도");
                 ItemDataManager.Instance.SpawnItem(transform.position, blockSO.hp);
             }
         }

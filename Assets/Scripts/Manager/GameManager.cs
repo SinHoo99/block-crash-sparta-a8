@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public event Action OnCopyBallEvent;
     public event Action OnFinishStageEvent;
     public event Action<bool> OnChangeLifeEvent;
-    
+
 
     private int highScore;
     private int currentScore;
@@ -24,14 +24,14 @@ public class GameManager : MonoBehaviour
     private int ballCount;
     private int stageLevel = 1;
     private bool isMulti = false;
-    private int life;    
+    private int life;
 
     public ObjectPool ObjectPool { get; private set; }
 
     private void Awake()
-    {        
+    {
         if (Instance != null) Destroy(gameObject);
-        Instance = this;        
+        Instance = this;
     }
 
     private void Start()
@@ -40,15 +40,15 @@ public class GameManager : MonoBehaviour
         players[0] = GameObject.Find("Player").transform.GetChild(0).gameObject;
         players[1] = GameObject.Find("Player").transform.GetChild(1).gameObject;
         players[1].SetActive(isMulti);
-        stageController = GameObject.Find("Stage").gameObject.GetComponent<StageController>();        
+        stageController = GameObject.Find("Stage").gameObject.GetComponent<StageController>();
         StartStage(stageLevel);
         life = 0;
         for (int i = 0; i < 2; i++) AddLife();
-    }    
+    }
 
     private void StartStage(int stageLevel)
     {
-        CallFinishStageEvent();                
+        CallFinishStageEvent();
         ballCount = 0;
         currentScore = 0;
         if (stageLevel < 5) blockCount = stageController.StartStage(stageLevel);
@@ -63,11 +63,11 @@ public class GameManager : MonoBehaviour
     }
 
     private void ResetPlayerPos()
-    {  
-        Vector3 startPos = isMulti ? Vector3.left * 2 : Vector3.zero;
-        startPos += Vector3.down * 4.2f;
-        players[0].transform.position = startPos;
-        if (isMulti) players[1].transform.position = -startPos;   
+    {
+        Vector3 startPosX = isMulti ? Vector3.left * 2 : Vector3.zero;
+        Vector3 startPos = Vector3.down * 4.2f;
+        players[0].transform.position = startPos + startPosX;
+        if (isMulti) players[1].transform.position = startPos + startPosX;
     }
 
     private void ResetBallPos()
@@ -82,10 +82,10 @@ public class GameManager : MonoBehaviour
     public void DestroyBlock(int score)
     {
         currentScore += score;
-        if(currentScore > highScore) highScore = currentScore;
+        if (currentScore > highScore) highScore = currentScore;
 
-        if (--blockCount == 0) 
-            StartStage(++stageLevel);        
+        if (--blockCount == 0)
+            StartStage(++stageLevel);
     }
 
     public void CallChangeLifeEvent(bool isAdd)
@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void ReduceLife()
-    {        
+    {
         if (life-- > 0)
         {
             ResetPlayerPos();
@@ -116,8 +116,8 @@ public class GameManager : MonoBehaviour
     {
         GameObject obj = ObjectPool.SpawnFromPool("Ball");
         if (obj == null) return null;
-        BallController ball = obj.GetComponent<BallController>();        
-        ballCount++;        
+        BallController ball = obj.GetComponent<BallController>();
+        ballCount++;
 
         return obj;
     }
@@ -128,17 +128,17 @@ public class GameManager : MonoBehaviour
     }
     public void Copyballs()
     {
-        CallCopyBallEvent();        
+        CallCopyBallEvent();
     }
 
     public void DestroyBalls()
     {
-        if (--ballCount == 0) 
+        if (--ballCount == 0)
             ReduceLife();
-    }    
+    }
 
     private void GameOver()
     {
-        
+
     }
 }
