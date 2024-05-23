@@ -12,8 +12,8 @@ public class LifeCounter : MonoBehaviour
 
     private void Start()
     {
-        GameManager.Instance.OnChangeLifeEvent += ChangeLifeCount;        
         lifeStack = new Stack<GameObject>();
+        MainSceneManager.Instance.OnChangeLifeEvent += ChangeLifeCount;               
     }
 
     private void ChangeLifeCount(bool isAdd)
@@ -25,7 +25,7 @@ public class LifeCounter : MonoBehaviour
     private void drawLife()
     {
         GameObject obj = Instantiate(lifeSpriteObject,transform);
-        obj.transform.position += Vector3.up * lifeStack.Count * 0.6f;
+        obj.transform.position += Vector3.up * lifeStack.Count * 0.3f;
         lifeStack.Push(obj);        
     }
 

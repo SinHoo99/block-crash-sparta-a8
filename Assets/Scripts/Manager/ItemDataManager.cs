@@ -24,8 +24,7 @@ public class ItemDataManager : MonoBehaviour
         }
         else
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            Instance = this;            
             SetItemDictionary();
         }
     }
@@ -53,10 +52,10 @@ public class ItemDataManager : MonoBehaviour
     public void SpawnItem(Vector3 position, int blockHp)
     {
         int randomSpawnIndex = UnityEngine.Random.Range(0, 100); // 0부터 99 사이의 랜덤한 값을 선택
-        if (blockHp * 10 >= randomSpawnIndex)
-        {
+        if (blockHp * 20 >= randomSpawnIndex)
+        {            
             int randomItemIndex = UnityEngine.Random.Range(1, 5); // 1부터 4 사이의 랜덤한 값을 선택
-            ItemSO itemData = GetData(randomItemIndex);
+            ItemSO itemData = GetData(randomItemIndex);            
             if (itemData != null && itemPrefab != null)
             {
                 GameObject itemObject = Instantiate(itemPrefab, position, Quaternion.identity);

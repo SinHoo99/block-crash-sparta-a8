@@ -1,40 +1,99 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.AnimatedValues;
 using UnityEngine;
 
 public class PaddleMovement : MonoBehaviour
 {
     private PlayerController controller;
-    private Rigidbody2D rigidbody;    
+    private Rigidbody2D rigidbody;
+    private BoxCollider2D collider;
+    private FixedJoint2D joint;
 
-    private float size;
-    private float speed = 8f;    
+    private float sizeRate = 0.25f;
+    private float speed = 4f;    
     private Vector3 direction;
+    private bool isHold;
 
     private void Awake()
     {
         controller = GetComponentInParent<PlayerController>();
-        rigidbody = GetComponent<Rigidbody2D>();             
+        rigidbody = GetComponent<Rigidbody2D>();   
+        collider = GetComponent<BoxCollider2D>();
+        joint = GetComponent<FixedJoint2D>();
     }
 
     private void Start()
     {
         controller.OnMoveEvent += Move;
-        controller.OnFireEvent += Fire;        
+        controller.OnFireEvent += Fire;
+        joint.connectedBody = rigidbody;
     }
 
-    private void Update()
-    {        
-        rigidbody.velocity = direction;
+    private void FixedUpdate()
+    {
+        rigidbody.velocity = direction * speed;        
+    }
+
+    public void ResetState(Vector3 position)
+    {
+        transform.localPosition = position;
+        speed = 4f;
+        Vector3 scale = transform.localScale;
+        transform.localScale = new Vector3(1f, 1f, 0);
     }
 
     public void Move(float input)
     {
-        if (input == 0) rigidbody.constraints |= RigidbodyConstraints2D.FreezePositionX;
-        else rigidbody.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
-        direction = new Vector2(input, 0);
-        direction = direction * speed;     
+        if (input == 0)
+        {
+            rigidbody.constraints |= RigidbodyConstraints2D.FreezePositionX;            
+        }
+            
+        else
+        {
+            rigidbody.constraints &= ~RigidbodyConstraints2D.FreezePositionX;            
+        }
+            
+        direction = new Vector2(input, 0);        
+    }
+
+    public void Fire()
+    {
+        if (isHold) ShootBall();
+        else CheckHold();
+    }
+
+    private void CheckHold()
+    {
+        RaycastHit2D hit = Physics2D.BoxCast(collider.bounds.center, collider.size, 0f, Vector2.up, 0.1f,LayerMask.GetMask("Ball"));
+
+        if(hit.collider != null)
+        {
+            HoldBall(hit.collider.gameObject);
+        }
+    }
+
+    private void ShootBall()
+    {        
+        isHold = false;
+        float posX = joint.connectedAnchor.x > 0 ? 1f : -1f;        
+        BallController ball = joint.connectedBody.gameObject.GetComponent<BallController>();
+        joint.connectedBody = rigidbody;
+        joint.enabled = false;
+        ball.Shoot(posX);        
+    }
+
+    public void HoldBall(GameObject obj)
+    {
+        Rigidbody2D ball = obj.GetComponent<Rigidbody2D>();
+        isHold = true;
+        Vector3 pos = 0.3f * Vector3.up;
+        obj.transform.position = pos + gameObject.transform.position;
+        joint.enabled = true;
+        joint.connectedBody = ball;
+        obj.GetComponent<BallController>().Catched();
     }
     
     private void OnTriggerEnter2D(Collider2D collision)
@@ -49,17 +108,20 @@ public class PaddleMovement : MonoBehaviour
                 ApplyItem(collisionController.SoItem.itemType);
                 // 아이템 먹은 후 파괴
                 Destroy(collision.gameObject);
-            }
-            else
-            {
-                Debug.LogWarning("ItemController not found on the collided object.");
-            }
+            }            
+        }
+        else if(collision.gameObject.layer == 12)
+        {
+            MainSceneManager.Instance.ReduceLife();
         }
     }
 
-    public void Fire()
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        GameManager.Instance.Copyballs();
+        if (collision.gameObject.layer == 12)
+        {
+            MainSceneManager.Instance.ReduceLife();
+        }
     }
 
     public void ApplyItem(EItemType itemType)
@@ -74,28 +136,48 @@ public class PaddleMovement : MonoBehaviour
         }
         else if (itemType == EItemType.LIFE)
         {
-            GameManager.Instance.AddLife();
+            MainSceneManager.Instance.AddLife();
         }
         else if (itemType == EItemType.COPY)
         {
-            GameManager.Instance.Copyballs();
+            MainSceneManager.Instance.Copyballs();
         }
+        SoundManager.instance.PlayClip("GetItem");
     }
 
     public void ChangeSize()
-    {
-        //실제로 스케일에서 적용이 안됨
-        float randomsize = Random.Range(-1f, 2f);
-
-        size += randomsize;
+    {        
+        int randomsize = Random.Range(0, 4);
+    
+        if(randomsize == 0)
+        {
+            if (transform.lossyScale.x == 1) return;
+            Vector3 scale = transform.localScale;
+            transform.localScale = scale + Vector3.left * sizeRate;
+        }
+        else
+        {
+            if (transform.lossyScale.x == 2) return;
+            Vector3 scale = transform.localScale;
+            transform.localScale = scale + Vector3.right * sizeRate;         
+        }
 
     }
 
     public void ChangeSpeed()
     {
-        float changespeed = Random.Range(-2f, 3f);
+        int randomsize = Random.Range(0, 1);
 
-        speed += changespeed;
+        if (randomsize == 4)
+        {
+            if (speed == 3) return;
+            speed -= 1f;
+        }
+        else
+        {
+            if (speed == 7) return;
+            speed += 1f;
+        }
     }
 }
 

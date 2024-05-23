@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c929030e8d21edb499a8093ed8abb6e4, type: 3}
   m_Name: BossBlockSO
   m_EditorClassIdentifier: 
-  hp: 0
+  hp: 31
   blockId: 0
-  score: 0
+  score: 2000
   blockSpriteColor: 0
   isInvincible: 0

@@ -7,6 +7,8 @@ TagManager:
   - Ball
   - Block
   - Boss
+  - Spear
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -20,7 +22,7 @@ TagManager:
   - Item
   - Wall
   - Bottom
-  - 
+  - Boss
   - 
   - 
   - 

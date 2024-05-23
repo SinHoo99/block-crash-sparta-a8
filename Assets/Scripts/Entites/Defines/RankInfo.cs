@@ -1,6 +1,12 @@
-﻿public class RankInfo
+﻿[System.Serializable]
+public class RankInfo
 {
-    public int Rank { get; private set; }
-    public string Name { get; private set; }
-    public int Score { get; private set; }
+    public string Name;
+    public int Score;
+    
+    public RankInfo(string name, int scroe)
+    {        
+        Name = name;
+        Score = scroe;
+    }
 }
