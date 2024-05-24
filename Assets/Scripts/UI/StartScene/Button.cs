@@ -48,4 +48,12 @@ public class Button : MonoBehaviour
         GameManager.Instance.IsMulti = isMulti;
         SceneManager.LoadScene("MainScene");        
     }
+    public void MakePause()
+    {
+        Time.timeScale = 0f;
+    }
+    public void ResetPause()
+    {
+        Time.timeScale = 1f;
+    }
 }
